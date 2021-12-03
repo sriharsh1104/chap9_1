@@ -1,88 +1,61 @@
-use crate::Daterror::Invalidmonth;
-use crate::Daterror::Invalidday;
-use std::error::Error;
-use std::fmt;
-
-
 #[derive(Debug)]
-enum Daterror {
-    Invalidday,
-    Invalidmonth
-
+enum Daterr {
+    InvalidDay,
+    InvalidMonth,
+    InvalidYear,
 }
 
+use std::io;
 #[derive(Debug)]
 struct Date {
-    day: u8,
+    day: u16,
     month: u8,
-    year: i16
+    year: u32,
 }
-
-impl fmt::Display for Daterror {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            &Daterror::Invalidday => write!(f, "Day {} is outside range!", Invalidday),
-            &Daterror::Invalidmonth => write!(f, "Month {} is outside range!", Invalidmonth),
-        }
-    }
-}
-
-impl Error for Daterror {
-    fn description(&self) -> &str {
-        match self {
-            &Daterror::Invalidday => "Day is outside range!",
-            &Daterror::Invalidmonth => "Month is outside range!",
-        }
-    }
-
-}
-use std::io;
 
 fn main() {
-    println!("ENTER DAY");
     let mut day = String::new();
-    io::stdin()
-       .read_line(&mut day)
-       .expect("invalid input");
-
-    let day: u8 = day.trim().parse().ok().expect("invalid input");
-
-    println!("ENTER MONTH");
+    println!("Enter day");
+    io::stdin().read_line(&mut day).expect("Invalid day format");
+    let day: u16 = day.trim().parse().expect("Please enter in u16 format");
+    println!("Enter month");
     let mut month = String::new();
     io::stdin()
-       .read_line(&mut month)
-       .expect("invalid input");
-
-    let month: u8 = month.trim().parse().ok().expect("invalid input");
-
-    println!("ENTER YEAR");
+        .read_line(&mut month)
+        .expect("Invalid month format");
+    let month: u8 = month.trim().parse().expect("Please enter in u16 format");
+    println!("Enter year");
     let mut year = String::new();
     io::stdin()
-       .read_line(&mut year)
-       .expect("invalid input");
+        .read_line(&mut year)
+        .expect("Invalid year format");
+    let year: u32 = year.trim().parse().expect("Please enter in u16 format");
 
-    let year: i16 = year.trim().parse().ok().expect("invalid input");
-
-
-    let date = Date {
+    let date_a = Date {
         day: day,
         month: month,
-        year: year
+        year: year,
+    };
+    println!("{:?}",date_a);
+    fn get_date(date: &Date) -> Result<(), Daterr> {
+        
+        
+        if date.month < 1 || date.month > 12 {
+            Err(Daterr::InvalidMonth)
+        } else if date.day < 1 || date.day > 31 {
+            Err(Daterr::InvalidDay)
+        } else if date.year < 1 {
+            Err(Daterr::InvalidYear)
+        } else {
+            Ok(println!("Date : {:?}",date))
+        }
+    }
+    println!("{:?}", get_date(&date_a));
+    match get_date(&Date { day, month, year}) {
+        Ok(date) => println!("{:?}" ,date),
+        Err(e) => println!("Invalid Date format : {:?}", e)
     };
 
-    fn validate(date: &Date) -> Result<(), Daterror>  {
-        if date.month < 1 || date.month > 12 {
-        Err(Daterror::Invalidmonth)
-    }   else if date.day < 1 || date.day > 31 {
-        Err(Daterror::Invalidday)
-    }   else {
-        Ok(())
-    }
-}
-fn add_days(date: Date, days: i32) -> Result<Date, Daterror> {
-    validate(&date)?; 
-   
-    Ok(date)
-}
-println!("{:?}",validate(&date));
+    
+
 }
